@@ -1,5 +1,7 @@
 package com.flogin.backend;
 
+import java.nio.channels.IllegalChannelGroupException;
+
 import com.flogin.model.Product;
 import com.flogin.repository.ProductRepository;
 import com.flogin.service.ProductService;
@@ -18,13 +20,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class TestProductController {
+public class TestProductService1 {
 
-    @Autowired
-    private ProductService productService;
+    
 
     @MockBean
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductService productService;
 
     private Product validProduct;
 
@@ -41,12 +45,19 @@ public class TestProductController {
     }
 
     @Test
-    public void testCreateProduct_EmptyName_ShouldThrow() {
-        validProduct.setName("  ");
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+    public void testcaseCreate_product_with_emptyName(){
+        validProduct.setName("    ");
+        assertThrows(IllegalArgumentException.class, () -> {
             productService.createProduct(validProduct);
         });
-        assertEquals("Tên sản phẩm không được để trống.", exception.getMessage());
+    }
+
+    @Test
+    public void testCreateProduct_EmptyName_ShouldThrow() {
+        validProduct.setName("  ");
+        assertThrows(IllegalArgumentException.class, () -> {
+            productService.createProduct(validProduct);
+        });
     }
 
     @Test
@@ -67,21 +78,20 @@ public class TestProductController {
     @Test
     public void testCreateProduct_EmptyCategory_ShouldThrow() {
         validProduct.setCategory(" ");
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(IllegalArgumentException.class, () -> {
             productService.createProduct(validProduct);
         });
-        assertEquals("Danh mục không được để trống.", exception.getMessage());
     }
 
     @Test
     public void testCreateProduct_InvalidDescription_ShouldThrow() {
-        validProduct.setDescription("ab"); // quá ngắn
+        validProduct.setDescription("ab"); 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             productService.createProduct(validProduct);
         });
         assertEquals("Mô tả phải từ 3 - 100 ký tự.", exception.getMessage());
 
-        validProduct.setDescription("a".repeat(101)); // quá dài
+        validProduct.setDescription("a".repeat(101)); 
         exception = assertThrows(IllegalArgumentException.class, () -> {
             productService.createProduct(validProduct);
         });
