@@ -1,5 +1,7 @@
 package com.flogin.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -31,6 +33,8 @@ public class Product {
     private String img;
 
     private int quantity;
+    
+    private LocalDate create_at;
 
     public Product() {}
 
@@ -99,5 +103,13 @@ public class Product {
     }
     public void setQuantity(int quantity){
         this.quantity = quantity;
+    }
+
+    public LocalDate getCreate_at(){
+        return this.create_at;
+    }
+
+    public void setCreate_at (LocalDate create_at){
+        this.create_at = create_at;
     }
 }
