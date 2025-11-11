@@ -22,8 +22,6 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 public class TestProductService {
 
-    
-
     @MockBean
     private ProductRepository productRepository;
 
@@ -59,6 +57,7 @@ public class TestProductService {
             productService.createProduct(validProduct);
         });
     }
+
 
     @Test
     public void testCreateProduct_InvalidPrice_ShouldThrow() {
