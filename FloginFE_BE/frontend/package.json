@@ -12,7 +12,10 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"], 
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/setupTests.js",
+      "<rootDir>/jest.setup.js"
+    ],
     "transform": {
       "^.+\\.[jt]sx?$": "babel-jest"
     },

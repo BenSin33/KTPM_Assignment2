@@ -1,10 +1,11 @@
 /* global jest */
+import React from 'react';
 import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import Login from '../components/Login';
-import * as authService from '../services/authService';
+import Login from '../../component/login_dashboard/Login.jsx';
+import * as authService from '../../services/authService.js';
 import { beforeEach, test, expect, describe } from '@jest/globals';
 
-jest.mock('../services/authService');
+jest.mock('../../services/authService.js');
 
 describe('Login Mock Tests', () => {
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom'; 
-import Login from '../../component/Login';
+import Login from '../../component/login_dashboard/Login.jsx';
 import * as authService from '../../services/authService';
 import { beforeEach, test, expect, describe, jest } from '@jest/globals';
 

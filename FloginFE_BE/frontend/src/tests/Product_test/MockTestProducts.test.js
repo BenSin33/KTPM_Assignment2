@@ -1,4 +1,4 @@
-import { ProductsApi } from "../../services/api";
+import { ProductsApi } from "../../services/ProductAPI.js";
 import axios from "axios";
 const mockProducts = [
   {
