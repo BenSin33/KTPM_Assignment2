@@ -1,6 +1,6 @@
 package com.flogin.controller;
 
-import com.flogin.model.Account;
+import com.flogin.entity.Account;
 import com.flogin.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

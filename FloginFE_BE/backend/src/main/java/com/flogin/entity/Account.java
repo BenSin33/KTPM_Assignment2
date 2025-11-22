@@ -1,4 +1,4 @@
-package com.flogin.model;
+package com.flogin.entity;
 
 import jakarta.persistence.*;
 

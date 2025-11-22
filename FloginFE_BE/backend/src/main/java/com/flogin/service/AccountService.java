@@ -1,7 +1,7 @@
 package com.flogin.service;
 
 import com.flogin.dto.AccountDTO;
-import com.flogin.model.Account;
+import com.flogin.entity.Account;
 import com.flogin.repository.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -2,7 +2,7 @@ package com.flogin.backend;
 
 import java.nio.channels.IllegalChannelGroupException;
 
-import com.flogin.model.Product;
+import com.flogin.entity.Product;
 import com.flogin.repository.ProductRepository;
 import com.flogin.service.ProductService;
 
