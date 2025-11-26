@@ -1,4 +1,4 @@
-package com.flogin.service;
+package com.flogin.backend;
 
 import com.flogin.model.Account;
 import com.flogin.repository.AccountRepository;
@@ -72,7 +72,7 @@ public class AccountServiceTest {
 
     @Test
     void testLogin_accountNotFound() {
-        when(this.accountRepository.findByUsername("ronaldo")).thenReturn(Optional.empty());
+        when(this.accountRepository.findByUsername(account.getUsername())).thenReturn(Optional.empty());
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             accountService.login(account.getUsername(), account.getPassword());
         });
@@ -80,16 +80,39 @@ public class AccountServiceTest {
         verify(accountRepository, times(1)).findByUsername("ronaldo");
     }
 
-    // @Test
-    // void testLogin_wrongPassword() {
-    //     when(this.accountRepository.findByUsername("ronaldo"))
-    //             .thenReturn(Optional.of(new Account("ronaldo", "nogoat", "chibay@gmail.com", 1)));
+    @Test
+    void testLogin_wrongPassword() {
+        when(this.accountRepository.findByUsername("ronaldo"))
+                .thenReturn(Optional.of(new Account("ronaldo", "nogoat", "chibay@gmail.com", 1)));
 
-    //     Exception ex = assertThrows(IllegalArgumentException.class, () -> {
-    //         accountService.login("ronaldo", "chibay"); // mật khẩu sai
-    //     });
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            accountService.login("ronaldo", "iamgoat"); // mật khẩu sai
+        });
 
-    //     assertEquals("Incorrect password", ex.getMessage());
-    //     verify(accountRepository, times(1)).findByUsername("ronaldo");
-    // }
+        assertEquals("Incorrect password", ex.getMessage());
+        verify(accountRepository, times(1)).findByUsername("ronaldo");
+    }
+
+    @Test
+    void testLogin_emptyPassword() {
+        String username = "ronaldo";
+        String password = "";
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            accountService.login(username, password);
+        });
+        assertEquals(ex.getMessage(), "Password is required");
+        verify(accountRepository, never()).findByUsername(anyString());
+    }
+
+    @Test
+    void testLogin_shortUsername() {
+        String username = "ro";
+        String password = "nogoat";
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            accountService.login(username, password);
+        });
+        assertEquals(ex.getMessage(), "Username must be longer than 3 characters");
+        verify(accountRepository, never()).findByUsername(anyString());
+    }
+
 }
