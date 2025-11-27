@@ -1,6 +1,6 @@
 package com.flogin.controller;
 
-import com.flogin.model.Account;
+import com.flogin.entity.Account;
 import com.flogin.service.AccountService;
 import com.flogin.util.JwtUtil;
 
@@ -65,3 +65,4 @@ public class AuthController {
         }
     }
 }
+
