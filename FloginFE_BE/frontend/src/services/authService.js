@@ -1,22 +1,18 @@
 export const loginUser = async (username, password) => {
-  
-  const API_ENDPOINT = '/api/auth/login';
-
-  // Dùng 'fetch' để gửi yêu cầu POST đến server
-  const response = await fetch(API_ENDPOINT, {
-    method: 'POST',
+  const res = await fetch(`http://localhost:8081/api/auth/login`, {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json"
     },
-    body: JSON.stringify({ username, password }),
+    body: JSON.stringify({ username, password }) // gửi dữ liệu vào body
   });
 
-  // Nếu server trả về lỗi (ví dụ: 401 Unauthorized, 500 Server Error)
-  if (!response.ok) {
-    const errorData = await response.json(); // Lấy thông báo lỗi từ server
-    throw new Error(errorData.message || 'Đăng nhập thất bại');
-  }
+  const data = await res.json();
+  console.log("data ne");
+  console.log(data);
 
-  const data = await response.json();
+  if (!res.ok) {
+    throw new Error(data.message); // ném lỗi nếu status không OK
+  }
   return data;
 };
