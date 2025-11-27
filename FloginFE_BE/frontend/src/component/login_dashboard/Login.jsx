@@ -1,58 +1,41 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as authService from '../../services/authService.js';
-
+import { loginUser } from "../../services/authService";
 import "./Login.css";
 const Login = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [usernameError, setUsernameError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [loginMessage, setLoginMessage] = useState("");
-
-    const navigate = useNavigate(); 
-
+    const [message, setMessage] = useState("");
+    const navigate = useNavigate();
     const handleLogin = async (e) => {
         e.preventDefault();
-        if (!username) {
-            setUsernameError("Vui lòng nhập username");
-            return; // Dừng lại, không gọi API
-        } else {
-            setUsernameError(""); // Xóa lỗi cũ nếu có
-        }
-
-        if (!password) {
-            setPasswordError("Vui lòng nhập password");
-            return; // Dừng lại, không gọi API
-        } else {
-            setPasswordError(""); // Xóa lỗi cũ nếu có
-        }
-
         console.log("Username:", username);
         console.log("Password:", password);
-
+        // const res = await fetch(`http://localhost:8081/api/auth/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`, {
+        //     method: "POST",
+        // });
+        // const data = await res.json();
+        // if(res.ok){
+        //      console.log(data);
+        //      alert(data.message);
+        //     navigate("/product");
+        // } else {
+        //     alert(data.message);
+        // }
         try {
-            // 'data' chính là kết quả trả về, không phải 'res'
-            const data = await authService.loginUser(username, password);
-
-            // Giả sử mock { success: true } và API thật cũng trả về object
-            // Kiểm tra 'data' (hoặc data.success nếu bạn mock như vậy)
-            if(data){ 
-                 console.log(data);
-                 // Thay vì alert, hãy set state để test có thể thấy
-                 setLoginMessage("Đăng nhập thành công!"); // Hoặc data.message
-                 // alert(data.message); // Bỏ alert
-                 navigate("/product");
+            const data = await loginUser(username, password);
+            if (data.success) {
+                setMessage(data.message );
+                localStorage.setItem("token", data.token);
+                navigate("/products");
             } else {
-                // alert(data.message); // Bỏ alert
-                setLoginMessage("Thông tin đăng nhập không chính xác.");
+                setMessage(data.message);
             }
         } catch (error) {
-            console.error(error);
-            setLoginMessage("Đã xảy ra lỗi khi đăng nhập.");
+            setMessage(error.message);
         }
     };
-    
+
     return (
         <div className="login-container">
             <div className="login-box">
@@ -65,8 +48,8 @@ const Login = () => {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Nhập username"
+                            data-testid="username-input"
                         />
-                        {usernameError && <div data-testid="username-error" style={{ color: 'red' }}>{usernameError}</div>}
                     </div>
 
                     <div className="input-group">
@@ -76,20 +59,16 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Nhập password"
+                            data-testid="password-input"
                         />
-                        {passwordError && <div data-testid="password-error" style={{ color: 'red' }}>{passwordError}</div>}
                     </div>
 
-                    <button type="submit" className="login-btn">
+                    <button type="submit" className="login-btn" data-testid="login-button">
                         Đăng nhập
                     </button>
-
-                    {loginMessage && (
-                        <div data-testid="login-message" style={{ color: 'green', marginTop: '10px' }}>
-                            {loginMessage}
-                        </div>
-                    )}
                 </form>
+               <div style={{ color: "red", fontWeight: "bold", fontSize: "16px" }}>{message}</div>
+
             </div>
         </div>
     );
