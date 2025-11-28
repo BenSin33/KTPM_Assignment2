@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const URL_PRODUCTS = "http://localhost:8081/products";
+const URL_PRODUCTS = "http://localhost:8081/api/products";
 
 export const ProductsApi = {
   getAll: async () => {
