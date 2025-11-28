@@ -26,6 +26,7 @@
                 <span class="strong">95% </span>
                 <span class="quiet">Statements</span>
                 <span class='fraction'>19/20</span>
+
             </div>
         
             
@@ -37,16 +38,18 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>4/4</span>
+                <span class='fraction'>4/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
+              
                 <span class="strong">95% </span>
                 <span class="quiet">Lines</span>
                 <span class='fraction'>19/20</span>
+
             </div>
         
             
@@ -141,21 +144,26 @@
 <a name='L76'></a><a href='#L76'>76</a>
 <a name='L77'></a><a href='#L77'>77</a>
 <a name='L78'></a><a href='#L78'>78</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
+
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">2x</span>
+
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -168,6 +176,7 @@
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
+
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -175,6 +184,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -199,6 +209,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -217,10 +233,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../../services/authService";
 import "./Login.css";
+&nbsp;
 const Login = () =&gt; {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -228,6 +246,7 @@ const Login = () =&gt; {
     const navigate = useNavigate();
     const handleLogin = async (e) =&gt; {
         e.preventDefault();
+
         console.log("Username:", username);
         console.log("Password:", password);
         // const res = await fetch(`http://localhost:8081/api/auth/login?username=${encodeURIComponent(username)}&amp;password=${encodeURIComponent(password)}`, {
@@ -252,6 +271,7 @@ const Login = () =&gt; {
             }
         } catch (error) {
             setMessage(error.message);
+
         }
     };
 &nbsp;
@@ -269,6 +289,7 @@ const Login = () =&gt; {
                             placeholder="Nhập username"
                             data-testid="username-input"
                         /&gt;
+
                     &lt;/div&gt;
 &nbsp;
                     &lt;div className="input-group"&gt;
@@ -280,6 +301,7 @@ const Login = () =&gt; {
                             placeholder="Nhập password"
                             data-testid="password-input"
                         /&gt;
+
                     &lt;/div&gt;
 &nbsp;
                     &lt;button type="submit" className="login-btn" data-testid="login-button"&gt;
@@ -293,8 +315,7 @@ const Login = () =&gt; {
     );
 };
 &nbsp;
-export default Login;
-&nbsp;</pre></td></tr></table></pre>
+export default Login;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
             </div><!-- /wrapper -->
