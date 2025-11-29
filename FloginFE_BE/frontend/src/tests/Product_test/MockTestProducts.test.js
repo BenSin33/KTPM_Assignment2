@@ -35,7 +35,7 @@ describe("Mock test getAllProducts", () => {
 
     const products = await ProductsApi.getAll();
     expect(products).toEqual(mockProducts);
-    expect(axios.get).toHaveBeenCalledWith("http://localhost:8081/products");
+    expect(axios.get).toHaveBeenCalledWith("http://localhost:8081/api/products");
   });
 
   test("lay san pham theo ID", async () => {
@@ -45,7 +45,7 @@ describe("Mock test getAllProducts", () => {
     const result = await ProductsApi.getByID(1);
 
     expect(result).toEqual(product);
-    expect(axios.get).toHaveBeenCalledWith("http://localhost:8081/products/1");
+    expect(axios.get).toHaveBeenCalledWith("http://localhost:8081/api/products/1");
   });
 
   test("them san pham", async () => {
@@ -56,7 +56,7 @@ describe("Mock test getAllProducts", () => {
 
     expect(result).toEqual(product);
     expect(axios.post).toHaveBeenCalledWith(
-      "http://localhost:8081/products",
+      "http://localhost:8081/api/products",
       product
     );
   });
@@ -70,7 +70,7 @@ describe("Mock test getAllProducts", () => {
 
     expect(result).toEqual(product);
     expect(axios.put).toHaveBeenCalledWith(
-      "http://localhost:8081/products/1",
+      "http://localhost:8081/api/products/1",
       product
     );
   });
@@ -83,7 +83,7 @@ describe("Mock test getAllProducts", () => {
 
     expect(result).toEqual(mockres);
     expect(axios.delete).toHaveBeenCalledWith(
-      "http://localhost:8081/products/1"
+      "http://localhost:8081/api/products/1"
     );
   });
 });
