@@ -130,3 +130,36 @@ textarea.error{
     margin-left: 2px;
     text-align: left;
 }
+
+/* Container chứa input và button */
+.search-controls {
+    display: flex; /* Sắp xếp input và button trên cùng một hàng */
+    gap: 10px; /* Khoảng cách giữa input và button */
+    margin-bottom: 20px; /* Khoảng cách dưới cùng, tách biệt với nút Add */
+    max-width: 600px; /* Giới hạn độ rộng tối đa của thanh tìm kiếm */
+}
+
+/* Điều chỉnh kích thước Input */
+.search-input {
+    flex-grow: 1; /* Cho phép input chiếm hết không gian còn lại */
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Điều chỉnh kích thước Button */
+.search-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #007bff; /* Màu xanh dương (hoặc màu phù hợp với ứng dụng của bạn) */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-button:hover {
+    background-color: #0056b3;
+}
