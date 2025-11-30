@@ -1,4 +1,4 @@
-package com.flogin.backend;
+package com.flogin.backend.IntegrationProductTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
