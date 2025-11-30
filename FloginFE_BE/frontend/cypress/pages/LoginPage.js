@@ -3,6 +3,10 @@
 class LoginPage {
     // Định nghĩa Locators (Selectors)
     elements = {
+        passwordError: () => cy.get('[data-testid="password-error"]'), // <-- Selector phải là HÀM
+        usernameError: () => cy.get('[data-testid="username-error"]'),
+
+        passwordError: () => cy.get('[data-testid="password-error"]'),
         usernameInput: () => cy.get('[data-testid="username-input"]'),
         passwordInput: () => cy.get('[data-testid="password-input"]'),
         loginButton: () => cy.get('[data-testid="login-button"]'),
@@ -45,6 +49,12 @@ class LoginPage {
     
     getUsernameError() {
         return this.elements.usernameError();
+    }
+    getUsernameError() {
+        return this.elements.usernameError();
+    }
+    getPasswordError() {
+        return this.elements.passwordError(); // <-- PHẢI TRẢ VỀ KẾT QUẢ GỌI HÀM SELECTOR
     }
 }
 
