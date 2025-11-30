@@ -44,25 +44,22 @@ const Login = () => {
         console.log("Password:", password);
 
         try {
-            const data = await loginUser(username, password);
+            const data = await loginUser(username, password); // data đã là JSON rồi
 
-            // Xử lý kết quả trả về
-            if (data && data.success) {
-                // Set thông báo thành công (Test cần cái này)
+            if (data.success) {
                 setMessage("Đăng nhập thành công!");
-
                 localStorage.setItem("token", data.token);
 
-                // Chuyển trang sau một khoảng thời gian ngắn (optional)
                 setTimeout(() => {
-                    navigate("/product"); // Sửa lại đường dẫn cho đúng với router của bạn
+                    navigate("/products");
                 }, 1000);
             } else {
-                setMessage(data.message || "Đăng nhập thất bại");
+                setMessage(data?.message || "Đăng nhập thất bại");
             }
         } catch (error) {
-            setMessage("Lỗi hệ thống hoặc sai thông tin");
+            setMessage(error?.message || "Lỗi hệ thống hoặc sai thông tin");
         }
+
     };
 
     return (
@@ -88,7 +85,7 @@ const Login = () => {
                     </div>
 
                     <div className="input-group">
-                        <label>Password</label>
+<label>Password</label>
                         <input
                             type="password"
                             value={password}
@@ -123,4 +120,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Login; 

@@ -1,52 +1,51 @@
 // frontend/cypress/pages/LoginPage.js
 
 class LoginPage {
-    // 1. Định nghĩa các Locators (bộ định vị phần tử)
-    // Sử dụng data-testid mà bạn đã thêm vào Login.jsx
+    // Định nghĩa Locators (Selectors)
     elements = {
         usernameInput: () => cy.get('[data-testid="username-input"]'),
         passwordInput: () => cy.get('[data-testid="password-input"]'),
         loginButton: () => cy.get('[data-testid="login-button"]'),
-        usernameError: () => cy.get('[data-testid="username-error"]'), // Lỗi validation client-side
-        loginMessage: () => cy.get('[data-testid="login-message"]'),   // Thông báo chung từ API
+        
+        // Selector thông báo lỗi/thành công (Dựa trên code React và đề bài)
+        // Lưu ý: Đề bài dùng 'login-message' nhưng code React dùng div style, ta dùng data-testid để dễ test E2E.
+        loginMessage: () => cy.get('[data-testid="login-message"]'), 
+        
+        // Selector cho lỗi validation (Dựa trên ví dụ đề bài)
+        usernameError: () => cy.get('[data-testid="username-error"]'),
     };
 
-    // ------------------- HÀNH ĐỘNG (Actions) -------------------
-
+    // Hành động: Điều hướng đến trang đăng nhập. Giả định trang login là trang gốc (/)
     visit() {
-        // Điều hướng đến trang đăng nhập
-        cy.visit('/login');
+        cy.visit('/'); 
     }
 
+    // Hành động: Điền thông tin đăng nhập
     fillLoginForm(username, password) {
-        // Điền username và password vào các trường input
-        this.elements.usernameInput().type(username);
-        this.elements.passwordInput().type(password);
+        this.elements.usernameInput().clear().type(username);
+        this.elements.passwordInput().clear().type(password);
     }
 
+    // Hành động: Click nút đăng nhập
     submitLogin() {
-        // Click nút đăng nhập
         this.elements.loginButton().click();
     }
 
+    // Phương thức tổng hợp thực hiện cả quá trình đăng nhập
     login(username, password) {
-        // Phương thức tổng hợp thực hiện cả quá trình đăng nhập
-        this.visit();
+        // Không gọi visit() ở đây để các test case có thể tự gọi visit() hoặc mock API trước.
         this.fillLoginForm(username, password);
         this.submitLogin();
     }
 
-    // ------------------- LOCATORS & GETTERS (Lấy giá trị) -------------------
-
-    getLoginMessage() {
-        // Lấy phần tử thông báo chung (thành công/thất bại API)
+    // Getters cho Assertions
+    getNotificationMessage() {
         return this.elements.loginMessage();
     }
-
-    getUsernameValidationError() {
-        // Lấy phần tử chứa lỗi validation của Username
+    
+    getUsernameError() {
         return this.elements.usernameError();
     }
 }
 
-export default LoginPage;
+export default LoginPage; // Export class thay vì instance

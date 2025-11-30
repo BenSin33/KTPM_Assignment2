@@ -1,0 +1,78 @@
+# File: KTPM_Assignment2/.github/workflows/login-tests.yml
+name: 🔐 Login Tests CI (E2E & Unit)
+
+on:
+  # Chạy khi có push/pull request trên các nhánh chính
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-login:
+    runs-on: ubuntu-latest
+    
+    # 1. Khởi động Dịch vụ Backend (Spring Boot trên cổng 8081)
+    services:
+      backend:
+        image: openjdk:21-jdk # Sử dụng Java 17 để chạy Spring Boot
+        ports:
+          - 8081:8081 # Map cổng Backend
+        options: >-
+          --name backend_service
+          --entrypoint /bin/bash -c
+          "cd FloginFE_BE/backend && 
+          chmod +x mvnw && # Đảm bảo quyền thực thi cho Maven Wrapper
+          ./mvnw clean install -DskipTests && # Build Backend, bỏ qua Unit Tests
+          ./mvnw spring-boot:run & # Chạy Server ở chế độ nền
+          sleep 60" # Chờ 60 giây để server Spring Boot khởi động hoàn toàn
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup Môi trường Node.js (Cho Frontend và Cypress)
+      - name: ⚙️ Setup Node.js 
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Sử dụng phiên bản Node.js phù hợp
+
+      - name: 📦 Install dependencies (Frontend)
+        run: |
+          cd FloginFE_BE/frontend
+          npm install
+          
+      # 3. Khởi động Frontend Server (Vite/React trên cổng 5173)
+      - name: 💻 Start Frontend Server
+        run: |
+          cd FloginFE_BE/frontend
+          # Chạy Frontend ở chế độ nền
+          npm run dev -- --host 0.0.0.0 &
+          sleep 15 # Cho thời gian khởi động Frontend
+
+      # --- Chạy Tests ---
+
+      # [Tùy chọn] Chạy Unit/Integration Tests (Nhanh hơn E2E)
+      - name: 🧪 Run Login Unit/Integration Tests
+        run: |
+          cd FloginFE_BE/frontend
+          # Lệnh này giả định bạn có script "test" trong package.json
+          npm test -- --testPathPattern=Login
+          
+      # 4. Run Login E2E Tests (Sử dụng Cypress)
+      - name: 🌐 Run Login E2E Tests
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: FloginFE_BE/frontend
+          # Lệnh chạy E2E headless (dành cho CI)
+          command: npm run test:e2e:ci -- --spec "cypress/e2e/login.spec.js"
+          # Cấu hình BASE URL cho Cypress
+          config: baseUrl=http://localhost:5173 
+          
+      # 5. Generate Test Reports (Lưu artifacts)
+      - name: 📄 Upload Cypress Reports (Videos & Screenshots)
+        uses: actions/upload-artifact@v4
+        if: always() # Luôn chạy, kể cả khi test fail
+        with:
+          name: login-e2e-reports
+          path: FloginFE_BE/frontend/cypress/videos/
