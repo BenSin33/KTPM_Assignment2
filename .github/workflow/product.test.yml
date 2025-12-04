@@ -1,0 +1,77 @@
+# File: KTPM_Assignment2/.github/workflows/product-tests.yml
+name: 📦 Product Tests CI (Unit, Mock, E2E)
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-product:
+    runs-on: ubuntu-latest
+    
+    # 1. Khởi động Dịch vụ Backend (Bắt buộc cho E2E và Integration)
+    services:
+      backend:
+        image: openjdk:21-jdk 
+        ports:
+          - 8081:8081 
+        options: >-
+          --name backend_service
+          --entrypoint /bin/bash -c
+          "cd FloginFE_BE/backend && 
+          chmod +x mvnw && 
+          # Chạy tất cả các Java tests (Nếu có Product Mock/Integration tests ở Backend)
+          ./mvnw clean install && 
+          ./mvnw spring-boot:run & 
+          sleep 60" # Chờ Backend khởi động
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Install dependencies (Frontend)
+        run: |
+          cd FloginFE_BE/frontend
+          npm install
+          
+      # 2. Khởi động Frontend Server (Vite/React)
+      - name: 💻 Start Frontend Server
+        run: |
+          cd FloginFE_BE/frontend
+          npm run dev -- --host 0.0.0.0 &
+          sleep 15 
+
+      # -------------------------------------------------------------
+      # 3. CHẠY JEST TESTS CHO PRODUCT (UNIT, MOCK, INTEGRATION)
+      # -------------------------------------------------------------
+      - name: 🧪 Run Product Unit, Mock, Integration Tests (Jest)
+        run: |
+          cd FloginFE_BE/frontend
+          # Lệnh này chạy tất cả các file test trong thư mục Product_test,
+          # bao gồm cả MockTestProducts.test.js của bạn.
+          npm test -- --testPathPattern=Product_test 
+          
+      # -------------------------------------------------------------
+      # 4. CHẠY CYPRESS E2E TEST CHO PRODUCT
+      # -------------------------------------------------------------
+      - name: 📦 Run Product E2E Tests (Cypress)
+        uses: cypress-io/github-action@v6
+        with:
+          working-directory: FloginFE_BE/frontend
+          command: npm run test:e2e:ci -- --spec "cypress/e2e/Product.e2e.cy.js" 
+          config: baseUrl=http://localhost:5173 
+          
+      # 5. Generate Test Reports (Lưu artifacts)
+      - name: 📄 Upload Cypress Reports (Videos & Screenshots)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: product-e2e-reports
+          path: FloginFE_BE/frontend/cypress/videos/
