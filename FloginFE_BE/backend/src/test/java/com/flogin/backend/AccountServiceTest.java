@@ -1,6 +1,6 @@
 package com.flogin.backend;
 
-import com.flogin.model.Account;
+import com.flogin.entity.Account;
 import com.flogin.repository.AccountRepository;
 import com.flogin.service.AccountService;
 

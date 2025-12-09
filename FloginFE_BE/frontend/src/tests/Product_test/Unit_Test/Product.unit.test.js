@@ -1,5 +1,7 @@
+//ký hiệu đồng : ₫
+
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import ProductDashboard from "../../../component/product_dashboard/Product.jsx";
 import { ProductsApi } from "../../../services/ProductAPI.js";
 
@@ -9,7 +11,7 @@ jest.mock("../../../services/ProductAPI.js");
 describe("ProductDashboard Component", () => {
     const mockProduct = {
         id: 1,
-        name: "Laptop Dell",
+        name: "Laptop Pro",
         price: 15000000,
         quantity: 10,
         description: "Máy tính xách tay hiệu suất cao",
@@ -42,46 +44,60 @@ describe("ProductDashboard Component", () => {
 
     test("TC_PRODUCT_007 - Hiển thị danh sách sản phẩm", async () => {
         render(<ProductDashboard />);
-        expect(await screen.findByText("Laptop Dell")).toBeInTheDocument();
+        expect(await screen.findByText("Laptop Pro")).toBeInTheDocument();
         expect(screen.getByText("15.000.000 ₫")).toBeInTheDocument();
     });
 
-    test("TC_PRODUCT_001 - Tạo sản phẩm mới thành công", async () => {
-        render(<ProductDashboard />);
-        fireEvent.click(screen.getByText("Thêm sản phẩm"));
+    test ("TC_PRODUCT_001 - Tạo sản phẩm mới thành công", async () => {
+        render (<ProductDashboard/>);
 
-        fireEvent.change(screen.getByPlaceholderText("Tên sản phẩm"), { target: { value: "Laptop Dell New" } });
-        fireEvent.change(screen.getByPlaceholderText("Danh mục"), { target: { value: "Electronics" } });
-        fireEvent.change(screen.getByPlaceholderText("Giá (VND)"), { target: { value: "15000000" } });
-        fireEvent.change(screen.getByPlaceholderText("Số lượng"), { target: { value: "10" } });
-        fireEvent.change(screen.getByPlaceholderText("Mô tả sản phẩm"), { target: { value: "New Description" } });
+        fireEvent.click(await screen.findByText("Thêm sản phẩm"));
 
-        fireEvent.click(screen.getByText("Thêm mới"));
+        fireEvent.change(screen.getByPlaceholderText("Tên sản phẩm"), { target : { value: "Laptop Pro"} });
+        fireEvent.change(screen.getByPlaceholderText("Danh mục"), { target : { value: "Electronics"} });
+        fireEvent.change(screen.getByPlaceholderText("Thương hiệu"), { target : { value: "adudu"} });
+        fireEvent.change(screen.getByPlaceholderText("Giá (VND)"), { target : { value: "25000000"} });
+        fireEvent.change(screen.getByPlaceholderText("Số lượng"), { target : { value: "150"} });
+        fireEvent.change(screen.getByPlaceholderText("Link hình ảnh"), { target : { value: "https://example.com/image.jpg"} });
+        fireEvent.change(screen.getByPlaceholderText("Mô tả sản phẩm"), { target : { value: "adudu"} });
+        fireEvent.click(await screen.findByText("Thêm mới"));
 
-        await waitFor(() => {
-            expect(ProductsApi.addProduct).toHaveBeenCalled();
-        });
-    });
+        await waitFor( () => {
+            expect (ProductsApi.addProduct).toHaveBeenCalled();
+        })
+    })
 
     test("TC_PRODUCT_002 - Cập nhật sản phẩm thành công", async () => {
-        render(<ProductDashboard />);
-        fireEvent.click(await screen.findByText("Sửa"));
 
-        fireEvent.change(screen.getByPlaceholderText("Số lượng"), { target: { value: "20" } });
-        fireEvent.click(screen.getByText("Cập nhật"));
+        render (<ProductDashboard/>);
+
+        fireEvent.click(await screen.findByText("Sửa"))
+
+        fireEvent.change(screen.getByPlaceholderText("Giá (VND)"), { target : { value: "26000000"}});
+        fireEvent.change(screen.getByPlaceholderText("Số lượng"), { target : { value: "100"}});
+        fireEvent.click (await screen.getByText("Cập nhật"));
 
         await waitFor(() => {
-            expect(ProductsApi.updateProduct).toHaveBeenCalledWith(1, expect.objectContaining({ quantity: "20" }));
+            expect(ProductsApi.updateProduct).toHaveBeenCalledWith(1, expect.objectContaining({ price: "26000000", quantity: "100" }));
         });
     });
 
-    test("TC_PRODUCT_004 - Xóa sản phẩm thành công", async () => {
-        render(<ProductDashboard />);
-        fireEvent.click(await screen.findByText("Xóa"));
+    test('TC_PRODUCT_003 - Xoá sản phẩm thành công', async () => {
+        render(<ProductDashboard/>);
 
-        await waitFor(() => {
+        const productName = await screen.findByText("Laptop Pro");
+        const productRow = productName.closest('tr');
+
+        expect(productRow).toBeInTheDocument;
+
+        const dltBtn = within(productRow).getByText("Xóa");
+
+        fireEvent.click(dltBtn);
+
+        await waitFor( () => {
             expect(ProductsApi.deleteProduct).toHaveBeenCalledWith(1);
-        });
+        })
+
     });
 
     // --- CÁC TEST CASE MỚI THÊM VÀO ---

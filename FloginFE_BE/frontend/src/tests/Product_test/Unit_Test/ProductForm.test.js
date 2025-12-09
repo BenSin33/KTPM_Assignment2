@@ -37,7 +37,7 @@ describe('ProductDashboard Validation Tests', () => {
 
         // 2. Danh mục: Nhập bừa "Test"
         // -> Vì ô này có required, phải nhập mới submit được form.
-        // (Nếu bạn muốn test lỗi danh mục, hãy nhập cái gì đó sai logic danh mục nếu có)
+        // ( muốn test lỗi danh mục, hãy nhập cái gì đó sai logic danh mục nếu có)
         const categoryInput = screen.getByPlaceholderText(/Danh mục/i);
         await user.type(categoryInput, 'Test Category');
 
