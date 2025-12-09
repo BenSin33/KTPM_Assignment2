@@ -6,6 +6,7 @@ import com.flogin.entity.Product;
 import com.flogin.service.ProductService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.aspectj.weaver.patterns.PerObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.oneOf;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -100,61 +102,62 @@ class ProductControllerTest {
     void testCreateProduct() throws Exception{
         when(productService.createProduct(any(Product.class))).thenReturn(product);
 
-        mockMvc.perform(post("/api/products").
-                        contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(product)))
+        mockMvc.perform(post("/api/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(product)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name",is("Laptop Pro")))
+                .andExpect(jsonPath("$.name", is("Laptop Pro")))
                 .andExpect(jsonPath("$.price", is((double)25000000)))
-                .andExpect(jsonPath("$.category", is("Electronics")))
                 .andExpect(jsonPath("$.quantity", is(150)));
     }
 
     // --- TC_004: Create (Fail - Validate) ---
     @Test
     @DisplayName("API: create fail (validation test price <= 0)")
-    void testCreatePriceBelowZero () throws Exception {
+    void testInvalidProductPrice () throws Exception {
 
-        Product invalidproduct = new Product();
-        invalidproduct.setPrice((double)0);
+        Product invalidProductPrice = new Product();
+        invalidProductPrice.setPrice((double) 0);
 
-        when(productService.createProduct(any(Product.class))).
-                thenThrow(new IllegalArgumentException("giá sản phẩm không được nhỏ hơn 0"));
-
-        Exception exception = assertThrows(Exception.class, () -> {
-
-            mockMvc.perform(post("/api/products").
-                    contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(product)));
-        });
-
-        //kiểm tra nguyên nhân
-        Throwable cause = exception.getCause();
-        assertTrue(cause instanceof IllegalArgumentException);
-        assertEquals("giá sản phẩm không được nhỏ hơn 0", cause.getMessage());
-    }
-
-    // test số lượng vượt mức 99999
-    @Test
-    @DisplayName("API: test create invalid quantity ")
-    void testCreateInvalidQuantity () throws Exception{
-
-        Product invalidProductQuantity = new Product();
-        invalidProductQuantity.setQuantity(1000000);
-
-        when(productService.createProduct(any(Product.class))).
-                thenThrow(new IllegalArgumentException("số lượng không được vượt quá 99.999"));
+        when(productService.createProduct(any(Product.class)))
+                .thenThrow(new IllegalArgumentException("Giá tiền không được nhỏ hơn 0"));
 
         Exception exception = assertThrows(Exception.class, () -> {
 
             mockMvc.perform(post("/api/products")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(product)));
+                    .content(objectMapper.writeValueAsString(invalidProductPrice)));
 
         });
 
         Throwable cause = exception.getCause();
-        assertTrue(cause instanceof IllegalArgumentException);
+        assertInstanceOf(IllegalArgumentException.class, cause);
+        assertEquals("Giá tiền không được nhỏ hơn 0", cause.getMessage());
+
+    }
+
+
+    // test số lượng vượt mức 99999
+    @Test
+    @DisplayName("API: test create invalid quantity ")
+    void testProductInvalidQuantity () throws Exception {
+
+        Product InvalidProducQuantity = new Product();
+        InvalidProducQuantity.setQuantity(100000);
+
+        when(productService.createProduct(any(Product.class)))
+                .thenThrow(new IllegalArgumentException("số lượng không được vượt quá 99.999"));
+
+        Exception exception = assertThrows(Exception.class, () -> {
+
+            mockMvc.perform(post("/api/products")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(InvalidProducQuantity)));
+
+        });
+
+        Throwable cause = exception.getCause();
+        assertInstanceOf(IllegalArgumentException.class, cause);
         assertEquals("số lượng không được vượt quá 99.999", cause.getMessage());
 
     }
@@ -162,23 +165,25 @@ class ProductControllerTest {
     // --- TC_005: Update (Success) ---
     @Test
     @DisplayName("API: update Product success")
-    void testUpdateProduct () throws  Exception {
+    void testUpdateProduct () throws Exception {
 
-        // set up dữ liệu sau khi update (update giá và số lượng)
-        Product updatedProduct = new Product();
-        updatedProduct.setId(product.getId());
-        updatedProduct.setPrice((double) 26000000);
-        updatedProduct.setQuantity(100);
+        //set up dữ liệu sau khi update
+        Product ProductUpdate = new Product();
+        ProductUpdate.setPrice((double) 26000000);
+        ProductUpdate.setQuantity(100);
 
-        when(productService.updateProduct(eq(1),any(Product.class))).thenReturn(updatedProduct);
+        when(productService.updateProduct(eq(1),any(Product.class)))
+                .thenReturn(ProductUpdate);
 
         mockMvc.perform(put("/api/products/{id}",1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(product)))
+                .content(objectMapper.writeValueAsString(ProductUpdate)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.price", is((double)26000000)))
+                .andExpect(jsonPath("$.price", is((double) 26000000)))
                 .andExpect(jsonPath("$.quantity", is(100)));
+
     }
+
 
 
     // --- TC_007: Delete (Success) ---

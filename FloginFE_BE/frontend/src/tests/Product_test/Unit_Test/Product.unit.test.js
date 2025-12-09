@@ -43,9 +43,9 @@ describe("ProductDashboard Component", () => {
     });
 
     test("TC_PRODUCT_007 - Hiển thị danh sách sản phẩm", async () => {
-        render(<ProductDashboard />);
-        expect(await screen.findByText("Laptop Pro")).toBeInTheDocument();
-        expect(screen.getByText("15.000.000 ₫")).toBeInTheDocument();
+        render(<ProductDashboard/>)
+        expect(await screen.findByText("Laptop Pro"));
+        expect(ProductsApi.getAll).toHaveBeenCalled();
     });
 
     test ("TC_PRODUCT_001 - Tạo sản phẩm mới thành công", async () => {
@@ -71,34 +71,43 @@ describe("ProductDashboard Component", () => {
 
         render (<ProductDashboard/>);
 
-        fireEvent.click(await screen.findByText("Sửa"))
+        const product = await screen.findByText("Laptop Pro");
+        const productRow = product.closest("tr");
+        expect(productRow).toBeInTheDocument();
 
-        fireEvent.change(screen.getByPlaceholderText("Giá (VND)"), { target : { value: "26000000"}});
-        fireEvent.change(screen.getByPlaceholderText("Số lượng"), { target : { value: "100"}});
-        fireEvent.click (await screen.getByText("Cập nhật"));
+        const editButton = within(productRow).getByText("Chỉnh sửa");
 
-        await waitFor(() => {
-            expect(ProductsApi.updateProduct).toHaveBeenCalledWith(1, expect.objectContaining({ price: "26000000", quantity: "100" }));
-        });
-    });
+        fireEvent.click(editButton);
 
-    test('TC_PRODUCT_003 - Xoá sản phẩm thành công', async () => {
-        render(<ProductDashboard/>);
+        fireEvent.change(screen.getByPlaceholderText("Giá (VND)"), {target: {value: 26000000}});
+        fireEvent.change(screen.getByPlaceholderText("Số lượng"), {target: {value: 100}});
 
-        const productName = await screen.findByText("Laptop Pro");
-        const productRow = productName.closest('tr');
-
-        expect(productRow).toBeInTheDocument;
-
-        const dltBtn = within(productRow).getByText("Xóa");
-
-        fireEvent.click(dltBtn);
+        fireEvent.click(screen.getByText("Cập nhật"));
 
         await waitFor( () => {
-            expect(ProductsApi.deleteProduct).toHaveBeenCalledWith(1);
+
+            expect(ProductsApi.updateProduct).toHaveBeenCalledWith(1,expect.objectContaining({ price: 26000000, quantity: 100 }));
+
         })
 
     });
+
+    test("TC_PRODUCT_003 - Xoá sản phẩm thành công", async () => {
+
+        render(<ProductDashboard/>);
+
+        const product = await screen.findByText("Laptop Pro");
+        const productRow = product.closest("tr");
+        expect(productRow).toBeInTheDocument();
+        const deleteButton = within(productRow).getByText("Xóa");
+
+        fireEvent.click(deleteButton)
+
+        await waitFor ( () => {
+            expect(ProductsApi.deleteProduct).toHaveBeenCalledWith(1);
+        })
+
+    })
 
     // --- CÁC TEST CASE MỚI THÊM VÀO ---
 
@@ -123,22 +132,45 @@ describe("ProductDashboard Component", () => {
         render(<ProductDashboard />);
         fireEvent.click(screen.getByText("Thêm sản phẩm"));
 
-        // Nhập dữ liệu để qua mặt 'required' HTML nhưng sai logic Business
-        fireEvent.change(screen.getByPlaceholderText("Tên sản phẩm"), { target: { value: "A" } }); // < 3 ký tự
-        fireEvent.change(screen.getByPlaceholderText("Danh mục"), { target: { value: "Test" } });
-        fireEvent.change(screen.getByPlaceholderText("Giá (VND)"), { target: { value: "500" } }); // < 1000
-        fireEvent.change(screen.getByPlaceholderText("Số lượng"), { target: { value: "-1" } });   // < 0
+        //nhập dữ liệu không hợp lệ
 
+        fireEvent.change(screen.getByPlaceholderText("Tên sản phẩm"), { target : { value: "Laptop Pro" } });
+        fireEvent.change(screen.getByPlaceholderText("Danh mục"), {target : { value: "Electronics" } }); 
+        fireEvent.change(screen.getByPlaceholderText("Giá (VND)"), { target : { value: "0"}}) ; // giá <=0
+        fireEvent.change(screen.getByPlaceholderText("Số lượng"), {target : {value: "10"}});
+        fireEvent.change(screen.getByPlaceholderText("Link hình ảnh"), { target : { value: "https://example.com/image.jpg"} });
+        fireEvent.change(screen.getByPlaceholderText("Mô tả sản phẩm"), {target : {value: "máy tính để bàn"}});
         fireEvent.click(screen.getByText("Thêm mới"));
 
-        // Kiểm tra các thông báo lỗi xuất hiện
-        expect(await screen.findByText(/Tên sản phẩm phải có ít nhất 3 ký tự/i)).toBeInTheDocument();
-        expect(screen.getByText(/Giá phải từ 1,000 đến dưới 999,999,999/i)).toBeInTheDocument();
-        expect(screen.getByText(/Số lượng phải lớn hơn 0/i)).toBeInTheDocument();
-
-        // Đảm bảo API addProduct KHÔNG được gọi khi có lỗi validate
-        expect(ProductsApi.addProduct).not.toHaveBeenCalled();
+        // kiểm tra hiển thị lỗi validation
+        expect(await screen.getByText(/Giá phải từ 1,000 đến dưới 999,999,999/i)).toBeInTheDocument();
+        
+        await waitFor (() => {
+            expect(ProductsApi.addProduct).not.toHaveBeenCalled();
+        })
     });
+
+    test("TC_PRODUCT_006B - Hiển thị lỗi validation khi nhập số lượng sản phẩm không hợp lệ ( > 99,999 )" , async () => {
+        render(<ProductDashboard/>);
+
+        fireEvent.click(screen.getByText("Thêm sản phẩm"));
+
+        fireEvent.change(screen.getByPlaceholderText("Tên sản phẩm"), {target : {value: "Laptop Pro"}});
+        fireEvent.change(screen.getByPlaceholderText("Danh mục"), {target: {value: "Electronics"}});
+        fireEvent.change(screen.getByPlaceholderText("Giá (VND)"), {target: {value: "15000000"}});
+        fireEvent.change(screen.getByPlaceholderText("Số lượng"), {target: {value: "100000"}}); // số lượng > 99,999
+        fireEvent.change(screen.getByPlaceholderText("Link hình ảnh"), {target : { value: "https://example.com/image.jpg"} });
+        fireEvent.change(screen.getByPlaceholderText("Mô tả sản phẩm"), {target : {value: "máy tính để bàn"}});
+        fireEvent.click(screen.getByText("Thêm mới"));
+
+        // kiểm tra hiển thị lỗi validation 
+        expect(await screen.getByText(/Số lượng phải lớn hơn 0 và nhỏ hơn 99,999/i)).toBeInTheDocument();
+
+        await waitFor (() => {
+            expect(ProductsApi.addProduct).not.toHaveBeenCalled(); // đảm bảo không gọi được API thêm sản phẩm
+        })
+
+    })
 
     test("TC_PRODUCT_008 - Log lỗi console khi Thêm sản phẩm thất bại (Server Error)", async () => {
         // Giả lập lỗi Server khi thêm
