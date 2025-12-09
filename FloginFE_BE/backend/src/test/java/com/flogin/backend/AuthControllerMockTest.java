@@ -1,181 +1,183 @@
-package com.flogin.backend; // Hoặc package tương ứng trong project của bạn
-
-import com.fasterxml.jackson.databind.ObjectMapper;
+package com.flogin.backend;
 import com.flogin.controller.AuthController;
 import com.flogin.entity.Account;
 import com.flogin.service.AccountService;
-import com.flogin.util.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.ResponseEntity;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
-@DisplayName("AuthController Tests")
 class AuthControllerMockTest {
 
-    private MockMvc mockMvc;
-
-    @Mock
-    private AccountService accountService;
-
-    @InjectMocks
     private AuthController authController;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private AccountService accountService; // mock thủ công
+    public Map<String, String> createLoginRequest (String username, String password) {
+        Map<String, String> loginRequest = new HashMap<>();
+        loginRequest.put("username", username);
+        loginRequest.put("password", password);
+        return loginRequest;
+    }
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        accountService = mock(AccountService.class);
+        authController = new AuthController(accountService); // inject mock vào controller
+    }
+    @Test 
+    @DisplayName("Test case 1: AuthController.login - Success Case")
+    void login_succes(){
+        Account account =  new Account("Test123","test123","gmail@gmail.com",1);
+        when(accountService.login(anyString(), anyString())).thenReturn(account);
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest("Test123", "test123"));
+        Map<String, Object> body = response.getBody();
+        assertAll("response",
+                () -> assertEquals(200, response.getStatusCodeValue()),
+                () -> assertNotNull(body),
+                () -> assertEquals(true, body.get("success")),
+                () -> assertEquals("Login successful", body.get("message")),
+                () -> assertNotNull(body.get("token"))
+
+        );
+        verify(accountService, times(1)).login(anyString(),anyString());
+    }
+    @Test
+    @DisplayName("Test case 2: AuthController.login - Empty Username")
+    void login_emptyUsername(){
+        when(accountService.login(anyString(), anyString())).thenThrow(new IllegalArgumentException("Username is required"));
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest("","test123"));
+        Map<String, Object> body = response.getBody();
+        assertAll("response",
+            () -> assertEquals(400, response.getStatusCodeValue()),
+            ()-> assertNotNull(body),
+            ()->assertEquals("Username is required",body.get("message")),
+            ()->assertEquals(false,body.get("success"))
+        );
+        verify(accountService,times(1)).login(anyString(), anyString());
+    }
+    @Test
+    @DisplayName("Test case 3: AuthController.login - Short Password")  
+    void login_shortPassword(){
+        when(accountService.login(anyString(), anyString())).thenThrow(new IllegalArgumentException("Password must be at least 6 characters"));
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest
+        ("Test123","123"));
+        Map<String, Object> body = response.getBody();  
+        assertAll("response",
+            () -> assertEquals(400, response.getStatusCodeValue()),
+            ()-> assertNotNull(body),
+            ()->assertEquals("Password must be at least 6 characters",body.get("message")),
+            ()->assertEquals(false,body.get("success"))
+        );
+        verify(accountService,times(1)).login(anyString(), anyString());
+
+    }
+    @Test
+    @DisplayName("Test case 4: AuthController.login - Username can only contain letters, numbers, ., -, _")
+    void login_invalidUsername(){
+        when(accountService.login(anyString(), anyString())).thenThrow(new IllegalArgumentException("Username can only contain letters, numbers, ., -, _"));
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest("Test@123","test123"));
+        Map<String, Object> body = response.getBody();
+        assertAll("response",
+            () -> assertEquals(400, response.getStatusCodeValue()),
+            ()-> assertNotNull(body),
+            ()->assertEquals("Username can only contain letters, numbers, ., -, _",body.get("message")),
+            ()->assertEquals(false,body.get("success"))
+        );
+        verify(accountService,times(1)).login(anyString(), anyString());
+
     }
 
-    // Helper method để tạo request body
-    private String createLoginRequestBody(String username, String password) throws Exception {
-        Map<String, String> loginRequest = new HashMap<>();
-        if (username != null) {
-            loginRequest.put("username", username);
-        }
-        if (password != null) {
-            loginRequest.put("password", password);
-        }
-        return objectMapper.writeValueAsString(loginRequest);
+    @Test 
+    @DisplayName("Test case 5: AuthController.login - Account Not Found")
+    void login_accountNotFound(){
+        when(accountService.login(anyString(), anyString())).thenThrow(new IllegalArgumentException("Invalid username or password"));
+        ResponseEntity<Map<String,Object>> response = authController.login(createLoginRequest("wrongusername","wrongpassword"));
+        Map<String, Object> body = response.getBody();
+        assertAll("response",
+            ()->assertEquals(401, response.getStatusCodeValue()),
+            ()->assertNotNull(body),
+            ()->assertEquals(false, body.get("success")),
+            ()->assertEquals("Invalid username or password", body.get("message"))
+        );
+        verify(accountService, times(1)).login(anyString(), anyString());
     }
+    @Test
+    @DisplayName("Test case 6: AuthController.login - Short Username")
+    void login_shortUsername(){
+        when(accountService.login(anyString(), anyString())).thenThrow(new IllegalArgumentException("Username must be longer than 3 characters"));
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest("ab", "test123"));
+        Map<String, Object> body = response.getBody();
+        assertAll("reponse",
+            () -> assertEquals(400, response.getStatusCodeValue()),
+            ()->assertNotNull(body),
+            ()->assertEquals("Username must be longer than 3 characters",body.get("message")),
+            ()->assertEquals(false, body.get("success"))
+        );
+        verify(accountService,times(1)).login(anyString(), anyString());
 
-    @Nested
-    @DisplayName("Success and Service Logic Scenarios")
-    class SuccessAndServiceLogic {
-
-        @Test
-        @DisplayName("Should return 200 OK with token when login is successful")
-        void login_Successful() throws Exception {
-            // Arrange
-            String username = "testuser";
-            String password = "password123";
-            String fakeToken = "fake.jwt.token";
-            Account account = new Account();
-            account.setUsername(username);
-            when(accountService.login(username, password)).thenReturn(account);
-
-            // Act & Assert
-            try (MockedStatic<JwtUtil> mockedJwtUtil = Mockito.mockStatic(JwtUtil.class)) {
-                mockedJwtUtil.when(() -> JwtUtil.generateToken(anyString())).thenReturn(fakeToken);
-
-                mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(createLoginRequestBody(username, password)))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.success").value(true))
-                        .andExpect(jsonPath("$.message").value("Login successful"))
-                        .andExpect(jsonPath("$.username").value(username))
-                        .andExpect(jsonPath("$.token").value(fakeToken));
-            }
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when AccountService throws an exception")
-        void login_WhenServiceThrowsException() throws Exception {
-            // Arrange
-            String username = "user";
-            String password = "wrongpassword";
-            String errorMessage = "Invalid username or password";
-            when(accountService.login(username, password)).thenThrow(new IllegalArgumentException(errorMessage));
-
-            // Act & Assert
-            mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createLoginRequestBody(username, password)))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.message").value(errorMessage));
-        }
     }
+    @Test 
+    @DisplayName("Test case 7: AuthController.login - Empty Password")
+    void login_emptyPassword(){
+        when(accountService.login(anyString(), anyString())).thenThrow(new IllegalArgumentException("Password is required"));
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest("Test123",""));
+        Map<String, Object> body = response.getBody();
+        assertAll("response",
+            () -> assertEquals(400, response.getStatusCodeValue()),
+            ()-> assertNotNull(body),
+            ()->assertEquals("Password is required",body.get("message")),
+            ()->assertEquals(false,body.get("success"))
+        );
+        verify(accountService,times(1)).login(anyString(), anyString());
 
-    @Nested
-    @DisplayName("Input Validation Scenarios")
-    class InputValidation {
-
-        @Test
-        @DisplayName("Should return 400 Bad Request for null username")
-        void login_WithNullUsername() throws Exception {
-            mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createLoginRequestBody(null, "password123")))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.message").value("Username is required"));
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request for empty username")
-        void login_WithEmptyUsername() throws Exception {
-            mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createLoginRequestBody(" ", "password123")))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.message").value("Username is required"));
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request for short username")
-        void login_WithShortUsername() throws Exception {
-            mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createLoginRequestBody("us", "password123")))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.message").value("Username must be longer than 3 characters"));
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request for null password")
-        void login_WithNullPassword() throws Exception {
-            mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createLoginRequestBody("testuser", null)))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.message").value("Password is required"));
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request for empty password")
-        void login_WithEmptyPassword() throws Exception {
-            mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createLoginRequestBody("testuser", "")))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.message").value("Password is required"));
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request for short password")
-        void login_WithShortPassword() throws Exception {
-            mockMvc.perform(post("/api/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(createLoginRequestBody("testuser", "12345")))
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.success").value(false))
-                    .andExpect(jsonPath("$.message").value("Password must be at least 6 characters"));
-        }
     }
+    
+    @Test
+    @DisplayName("Test case 8: AuthController.login - Wrong Password")
+    void login_wrongPassword(){
+        when(accountService.login(anyString(),anyString())).thenThrow(new IllegalArgumentException("Incorrect password"));
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest("Test123", "wrongpassword"));
+        Map<String, Object> body = response.getBody();
+        assertAll("response",
+            ()->assertEquals(401, response.getStatusCodeValue()),
+            ()->assertNotNull(body),
+            ()->assertEquals(false,body.get("success")),
+            ()->assertEquals("Incorrect password",body.get("message"))
+        );
+        verify(accountService, times(1)).login(anyString(), anyString());
+    }
+    @Test 
+    @DisplayName("Test case 9: AuthController.login - Username is Null")
+    void login_usernameNull(){
+        when(accountService.login(isNull(), anyString())).thenThrow(new IllegalArgumentException("Username is required"));
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest(null, "test123"));
+        Map<String, Object> body = response.getBody();  
+        assertAll("response",
+            () -> assertEquals(400, response.getStatusCodeValue()),
+            ()-> assertNotNull(body),
+            ()->assertEquals("Username is required",body.get("message")),
+            ()->assertEquals(false,body.get("success"))
+        );
+        verify(accountService,times(1)).login(isNull(), anyString());
+    }
+    @Test
+    @DisplayName("Test case 10: AuthController.login - Password is Null")
+    void login_passwordNull(){
+        when(accountService.login(anyString(), isNull())).thenThrow(new IllegalArgumentException("Password is required"));
+        ResponseEntity<Map<String, Object>> response = authController.login(createLoginRequest("Test123", null));
+        Map<String, Object> body = response.getBody();  
+        assertAll("response",
+            () -> assertEquals(400, response.getStatusCodeValue()),
+            ()-> assertNotNull(body),
+            ()->assertEquals("Password is required",body.get("message")),
+            ()->assertEquals(false,body.get("success"))
+        );
+        verify(accountService,times(1)).login(anyString(), isNull());
+    }   
 }
