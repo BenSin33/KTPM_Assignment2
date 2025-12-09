@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1765182147238" clover="3.2.0">
-  <project timestamp="1765182147238" name="All files">
+<coverage generated="1765304026000" clover="3.2.0">
+  <project timestamp="1765304026000" name="All files">
     <metrics statements="133" coveredstatements="129" conditionals="79" coveredconditionals="76" methods="29" coveredmethods="27" elements="241" coveredelements="232" complexity="0" loc="133" ncloc="133" packages="4" files="6" classes="6"/>
     <package name="component.login_dashboard">
       <metrics statements="33" coveredstatements="33" conditionals="20" coveredconditionals="20" methods="5" coveredmethods="5"/>
@@ -46,38 +46,38 @@
       <file name="Product.jsx" path="D:\MCRo VSCODE\Testing homework\KTPM_Assignment2\FloginFE_BE\frontend\src\component\product_dashboard\Product.jsx">
         <metrics statements="66" coveredstatements="62" conditionals="34" coveredconditionals="31" methods="16" coveredmethods="14"/>
         <line num="7" count="3" type="stmt"/>
-        <line num="8" count="72" type="stmt"/>
-        <line num="9" count="72" type="stmt"/>
-        <line num="10" count="72" type="stmt"/>
-        <line num="11" count="72" type="stmt"/>
-        <line num="12" count="72" type="stmt"/>
-        <line num="23" count="72" type="stmt"/>
-        <line num="25" count="72" type="stmt"/>
+        <line num="8" count="84" type="stmt"/>
+        <line num="9" count="84" type="stmt"/>
+        <line num="10" count="84" type="stmt"/>
+        <line num="11" count="84" type="stmt"/>
+        <line num="12" count="84" type="stmt"/>
+        <line num="23" count="84" type="stmt"/>
+        <line num="25" count="84" type="stmt"/>
         <line num="27" count="0" type="stmt"/>
-        <line num="30" count="72" type="stmt"/>
-        <line num="31" count="72" type="cond" truecount="1" falsecount="1"/>
-        <line num="32" count="72" type="stmt"/>
+        <line num="30" count="84" type="stmt"/>
+        <line num="31" count="84" type="cond" truecount="1" falsecount="1"/>
+        <line num="32" count="84" type="stmt"/>
         <line num="34" count="0" type="stmt"/>
         <line num="36" count="0" type="stmt"/>
         <line num="38" count="0" type="stmt"/>
-        <line num="42" count="72" type="stmt"/>
-        <line num="45" count="72" type="stmt"/>
-        <line num="46" count="11" type="stmt"/>
-        <line num="47" count="11" type="stmt"/>
-        <line num="48" count="11" type="stmt"/>
-        <line num="49" count="10" type="stmt"/>
+        <line num="42" count="84" type="stmt"/>
+        <line num="45" count="84" type="stmt"/>
+        <line num="46" count="12" type="stmt"/>
+        <line num="47" count="12" type="stmt"/>
+        <line num="48" count="12" type="stmt"/>
+        <line num="49" count="11" type="stmt"/>
         <line num="51" count="1" type="stmt"/>
-        <line num="54" count="11" type="stmt"/>
-        <line num="57" count="72" type="stmt"/>
-        <line num="58" count="41" type="stmt"/>
-        <line num="59" count="41" type="stmt"/>
-        <line num="62" count="72" type="stmt"/>
-        <line num="63" count="6" type="stmt"/>
-        <line num="64" count="6" type="stmt"/>
-        <line num="69" count="6" type="stmt"/>
-        <line num="70" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="71" count="2" type="stmt"/>
-        <line num="72" count="2" type="stmt"/>
+        <line num="54" count="12" type="stmt"/>
+        <line num="57" count="84" type="stmt"/>
+        <line num="58" count="49" type="stmt"/>
+        <line num="59" count="49" type="stmt"/>
+        <line num="62" count="84" type="stmt"/>
+        <line num="63" count="7" type="stmt"/>
+        <line num="64" count="7" type="stmt"/>
+        <line num="69" count="7" type="stmt"/>
+        <line num="70" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="71" count="3" type="stmt"/>
+        <line num="72" count="3" type="stmt"/>
         <line num="75" count="4" type="stmt"/>
         <line num="76" count="4" type="cond" truecount="2" falsecount="0"/>
         <line num="77" count="1" type="stmt"/>
@@ -90,23 +90,23 @@
         <line num="96" count="3" type="stmt"/>
         <line num="97" count="3" type="stmt"/>
         <line num="99" count="1" type="stmt"/>
-        <line num="103" count="72" type="stmt"/>
+        <line num="103" count="84" type="stmt"/>
         <line num="104" count="2" type="stmt"/>
         <line num="105" count="2" type="stmt"/>
         <line num="106" count="1" type="stmt"/>
         <line num="107" count="1" type="stmt"/>
         <line num="109" count="1" type="stmt"/>
-        <line num="113" count="72" type="stmt"/>
+        <line num="113" count="84" type="stmt"/>
         <line num="114" count="1" type="stmt"/>
         <line num="115" count="1" type="stmt"/>
         <line num="124" count="1" type="stmt"/>
         <line num="125" count="1" type="stmt"/>
-        <line num="128" count="72" type="stmt"/>
-        <line num="160" count="6" type="stmt"/>
-        <line num="161" count="6" type="stmt"/>
-        <line num="170" count="6" type="stmt"/>
-        <line num="171" count="6" type="stmt"/>
-        <line num="193" count="26" type="stmt"/>
+        <line num="128" count="84" type="stmt"/>
+        <line num="160" count="7" type="stmt"/>
+        <line num="161" count="7" type="stmt"/>
+        <line num="170" count="7" type="stmt"/>
+        <line num="171" count="7" type="stmt"/>
+        <line num="193" count="27" type="stmt"/>
         <line num="208" count="1" type="stmt"/>
         <line num="216" count="2" type="stmt"/>
         <line num="345" count="1" type="stmt"/>
@@ -115,7 +115,7 @@
       <file name="layout.jsx" path="D:\MCRo VSCODE\Testing homework\KTPM_Assignment2\FloginFE_BE\frontend\src\component\product_dashboard\layout.jsx">
         <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="4" count="3" type="stmt"/>
-        <line num="5" count="72" type="stmt"/>
+        <line num="5" count="84" type="stmt"/>
       </file>
     </package>
     <package name="services">
@@ -151,18 +151,18 @@
       <metrics statements="12" coveredstatements="12" conditionals="23" coveredconditionals="23" methods="1" coveredmethods="1"/>
       <file name="validation_product.js" path="D:\MCRo VSCODE\Testing homework\KTPM_Assignment2\FloginFE_BE\frontend\src\utils\validation_product.js">
         <metrics statements="12" coveredstatements="12" conditionals="23" coveredconditionals="23" methods="1" coveredmethods="1"/>
-        <line num="2" count="15" type="stmt"/>
-        <line num="4" count="15" type="cond" truecount="4" falsecount="0"/>
-        <line num="5" count="3" type="stmt"/>
-        <line num="8" count="15" type="cond" truecount="5" falsecount="0"/>
+        <line num="2" count="16" type="stmt"/>
+        <line num="4" count="16" type="cond" truecount="4" falsecount="0"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="8" count="16" type="cond" truecount="5" falsecount="0"/>
         <line num="9" count="4" type="stmt"/>
-        <line num="12" count="15" type="cond" truecount="5" falsecount="0"/>
+        <line num="12" count="16" type="cond" truecount="5" falsecount="0"/>
         <line num="13" count="4" type="stmt"/>
-        <line num="16" count="15" type="cond" truecount="5" falsecount="0"/>
-        <line num="17" count="4" type="stmt"/>
-        <line num="20" count="15" type="cond" truecount="4" falsecount="0"/>
+        <line num="16" count="16" type="cond" truecount="5" falsecount="0"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="20" count="16" type="cond" truecount="4" falsecount="0"/>
         <line num="21" count="1" type="stmt"/>
-        <line num="24" count="15" type="stmt"/>
+        <line num="24" count="16" type="stmt"/>
       </file>
     </package>
   </project>
