@@ -5,6 +5,7 @@ import com.flogin.repository.AccountRepository;
 import com.flogin.service.AccountService;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
@@ -25,18 +26,25 @@ public class AccountServiceTest {
         this.account = new Account("ronaldo", "chibay", "vapco@gmail.com", 1);
     }
 
+    
     @Test
+    @DisplayName("Test case 1: AccountService.login - Success Case")
     void testLogin_success() {
-        when(this.accountRepository.findByUsername("ronaldo")).thenReturn(Optional.of(this.account));
-        Account result = accountService.login(this.account.getUsername(), this.account.getPassword());
+        when(this.accountRepository.findByUsername(anyString())).thenReturn(Optional.of(this.account));
+        Account result = accountService.login("ronaldo", "chibay");
         assertAll("account",
                 () -> assertNotNull(result),
-                () -> assertEquals(this.account.getUsername(), result.getUsername()),
-                () -> assertEquals(this.account.getPassword(), result.getPassword()));
-        verify(accountRepository, times(1)).findByUsername("ronaldo");
+                () -> assertEquals("ronaldo", result.getUsername()),
+                () -> assertEquals("chibay", result.getPassword()),
+                () -> assertEquals("vapco@gmail.com", result.getEmail()),
+                () -> assertEquals(1, result.getActive())
+
+            );
+        verify(accountRepository, times(1)).findByUsername(anyString());
     }
 
     @Test
+    @DisplayName("Test case 2: AccountService.login - Empty Username")
     void testLogin_emptyUsername() {
         String username = "";
         String password = "nogoat";
@@ -48,6 +56,7 @@ public class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("Test case 3: AccountService.login - Short Password")
     void testLogin_shortPassword() {
         String username = "ronaldo";
         String password = "no";
@@ -59,6 +68,7 @@ public class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("Test case 4: AccountService.login - Invalid Username Format")
     void testLogin_invalidUsername() {
         String username = "ronaldo@ronaldo";
         String password = "nogoat";
@@ -71,29 +81,31 @@ public class AccountServiceTest {
     }
 
     @Test
+    @DisplayName("Test case 5: AccountService.login - Account Not Found")
     void testLogin_accountNotFound() {
-        when(this.accountRepository.findByUsername(account.getUsername())).thenReturn(Optional.empty());
+        when(this.accountRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
-            accountService.login(account.getUsername(), account.getPassword());
+            accountService.login("wrongusername", "nogoat");
         });
         assertEquals(ex.getMessage(), "Invalid username or password");
-        verify(accountRepository, times(1)).findByUsername("ronaldo");
+        verify(accountRepository, times(1)).findByUsername(anyString());
     }
-
     @Test
-    void testLogin_wrongPassword() {
-        when(this.accountRepository.findByUsername("ronaldo"))
-                .thenReturn(Optional.of(new Account("ronaldo", "nogoat", "chibay@gmail.com", 1)));
-
+    @DisplayName("Test case 6: AccountService.login - Short Username")
+    void testLogin_shortUsername() {
+        String username = "ro";
+        String password = "nogoat";
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
-            accountService.login("ronaldo", "iamgoat"); // mật khẩu sai
+            accountService.login(username, password);
         });
-
-        assertEquals("Incorrect password", ex.getMessage());
-        verify(accountRepository, times(1)).findByUsername("ronaldo");
+        assertEquals(ex.getMessage(), "Username must be longer than 3 characters");
+        verify(accountRepository, never()).findByUsername(anyString());
     }
 
+    
+
     @Test
+    @DisplayName("Test case 7: Test AccountService.login - Empty Password")
     void testLogin_emptyPassword() {
         String username = "ronaldo";
         String password = "";
@@ -105,13 +117,38 @@ public class AccountServiceTest {
     }
 
     @Test
-    void testLogin_shortUsername() {
-        String username = "ro";
+    @DisplayName("Test case 8: AccountService.login - Wrong Password")
+    void testLogin_wrongPassword() {
+        when(this.accountRepository.findByUsername(anyString()))
+                .thenReturn(Optional.of(new Account("ronaldo", "nogoat", "chibay@gmail.com", 1)));
+
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            accountService.login("ronaldo", "iamgoat"); // mật khẩu sai
+        });
+
+        assertEquals("Incorrect password", ex.getMessage());
+        verify(accountRepository, times(1)).findByUsername(anyString());
+    }
+    @Test
+    @DisplayName("Test case 9: AccountService.login - Username is Null")
+    void testLogin_usernameNull(){
+        String username = null;
         String password = "nogoat";
         Exception ex = assertThrows(IllegalArgumentException.class, () -> {
             accountService.login(username, password);
         });
-        assertEquals(ex.getMessage(), "Username must be longer than 3 characters");
+        assertEquals(ex.getMessage(), "Username is required");
+        verify(accountRepository, never()).findByUsername(isNull());
+    }
+    @Test 
+    @DisplayName("Test case 10: AccountService.login - Password is Null")
+    void testLogin_passwordNull(){
+        String username = "ronaldo";
+        String password = null;
+        Exception ex = assertThrows(IllegalArgumentException.class, () -> {
+            accountService.login(username, password);
+        });
+        assertEquals(ex.getMessage(), "Password is required");
         verify(accountRepository, never()).findByUsername(anyString());
     }
 
