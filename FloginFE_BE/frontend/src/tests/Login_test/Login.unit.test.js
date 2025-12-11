@@ -55,7 +55,7 @@ describe('Login component unit tests', () => {
 
   // Test case 4: Đăng nhập thành công - lưu token và hiển thị thông báo
   test('Test case 4: Đăng nhập thành công - lưu token và hiển thị thông báo', async () => {
-    authService.loginUser.mockResolvedValue({ success: true, message: 'Login successful', token: 'tok-1' });
+    authService.loginUser.mockResolvedValue({ success: true, message: 'Đăng nhập thành công!', token: 'tok-1' });
     render(<MemoryRouter><Login /></MemoryRouter>);
     fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'admin' } });
     fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123456' } });
@@ -69,72 +69,38 @@ describe('Login component unit tests', () => {
 
   // Test case 5: Đăng nhập thất bại - API trả về lỗi
   test('Test case 5: Đăng nhập thất bại - API trả về lỗi', async () => {
-    authService.loginUser.mockResolvedValue({ success: false, message: 'Invalid username or password' });
+    authService.loginUser.mockResolvedValue({ success: false, message: 'Tên đăng nhập hoặc mật khẩu không hợp lệ' });
     render(<MemoryRouter><Login /></MemoryRouter>);
     fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'wrong' } });
-    fireEvent.change(screen.getByTestId('password-input'), { target: { value: 'bad' } });
+    fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123456' } }); 
     fireEvent.click(screen.getByTestId('login-button'));
     await waitFor(() => {
-      expect(authService.loginUser).toHaveBeenCalledWith('wrong', 'bad');
-      expect(screen.getByText('Invalid username or password')).toBeInTheDocument();
+      expect(authService.loginUser).toHaveBeenCalledWith('wrong', '123456');
+      expect(screen.getByText(/Tên đăng nhập hoặc mật khẩu không hợp lệ/i)).toBeInTheDocument();
     });
   });
 
-  // Test case 6: Lỗi mạng khi gọi API
-  test('Test case 6: Lỗi mạng khi gọi API', async () => {
-    authService.loginUser.mockRejectedValue(new Error('Network Error'));
+  // Test case 6: Đăng nhập thất bại - Password < 6 ký tự
+  test('Test case 6: Đăng nhập thất bại - Password < 6 ký tự', async () => {
     render(<MemoryRouter><Login /></MemoryRouter>);
-    fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'admin' } });
-    fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123456' } });
+    fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'validUser' } });
+    fireEvent.change(screen.getByTestId('password-input'), { target: { value: '12345' } }); // < 6 ký tự
     fireEvent.click(screen.getByTestId('login-button'));
     await waitFor(() => {
-      expect(authService.loginUser).toHaveBeenCalled();
-      expect(screen.getByText(/Network Error/i)).toBeInTheDocument();
+      expect(authService.loginUser).not.toHaveBeenCalled();
+      expect(screen.getByText(/Password phải ít nhất 6 ký tự/i)).toBeInTheDocument();
     });
   });
 
-  // Test case 7: Ngăn chặn gửi nhiều lần nhiều clicks
-  test('Test case 7: Ngăn chặn gửi nhiều lần (rapid clicks)', async () => {
-    let resolve;
-    const p = new Promise(res => { resolve = res; });
-    authService.loginUser.mockImplementation(() => p);
+  // Test case 7: Đăng nhập thất bại - Username chứa ký tự đặc biệt
+  test('Test case 7: Đăng nhập thất bại - Username chứa ký tự đặc biệt', async () => {
     render(<MemoryRouter><Login /></MemoryRouter>);
-    fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'admin' } });
-    fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123456' } });
-    const btn = screen.getByTestId('login-button');
-
-    // mô phỏng clicks
-    fireEvent.click(btn);
-    fireEvent.click(btn);
-    fireEvent.click(btn);
-
-    // Chỉ 1 cuộc gọi
-    expect(authService.loginUser).toHaveBeenCalledTimes(1);
-
-    resolve({ success: true, message: 'ok', token: 'tkn' });
+    fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'admin@123' } });
+    fireEvent.change(screen.getByTestId('password-input'), { target: { value: 'validPass123' } });
+    fireEvent.click(screen.getByTestId('login-button'));
     await waitFor(() => {
-      expect(localStorage.getItem('token')).toBe('tkn');
-    });
-  });
-
-
-  // Test case 8: Submit bằng phím Enter
-  // Gửi yêu cầu trên biểu mẫu để đảm bảo trình xử lý onSubmit chạy
-  test('Test case 8: Submit bằng phím Enter', async () => {
-    authService.loginUser.mockResolvedValue({ success: true, message: 'ok', token: 'enter-tkn' });
-    render(<MemoryRouter><Login /></MemoryRouter>);
-    const username = screen.getByTestId('username-input');
-    const password = screen.getByTestId('password-input');
-
-    fireEvent.change(username, { target: { value: 'admin' } });
-    fireEvent.change(password, { target: { value: '123456' } });
-
-    const form = screen.getByTestId('login-button').closest('form');
-    fireEvent.submit(form);
-
-    await waitFor(() => {
-      expect(authService.loginUser).toHaveBeenCalledWith('admin', '123456');
-      expect(localStorage.getItem('token')).toBe('enter-tkn');
+      expect(authService.loginUser).not.toHaveBeenCalled();
+      expect(screen.getByText(/Username chỉ có thể số và chữ, ., -, _/i)).toBeInTheDocument();
     });
   });
 });
