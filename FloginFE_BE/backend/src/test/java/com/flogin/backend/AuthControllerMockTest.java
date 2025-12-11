@@ -11,8 +11,14 @@ import java.util.Map;
 import java.util.HashMap;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
+import org.mockito.MockedStatic;
+import static org.mockito.Mockito.mockStatic;
 import static org.junit.jupiter.api.Assertions.*;
+import com.flogin.util.JwtUtil;
+
+import io.jsonwebtoken.Jwt;
 
 class AuthControllerMockTest {
 
