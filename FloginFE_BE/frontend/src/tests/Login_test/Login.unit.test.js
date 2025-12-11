@@ -20,7 +20,7 @@ describe('Login component unit tests', () => {
     };
   });
 
-  // Test case 1: Hiển thị các trường username, password và nút đăng nhập
+  // Test case 1: Hiển thị các username, password và nút đăng nhập
   test('Test case 1: Hiển thị username, password và nút đăng nhập', () => {
     render(<MemoryRouter><Login /></MemoryRouter>);
     expect(screen.getByTestId('username-input')).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe('Login component unit tests', () => {
     });
   });
 
-  // Test case 7: Ngăn chặn gửi nhiều lần (rapid clicks)
+  // Test case 7: Ngăn chặn gửi nhiều lần nhiều clicks
   test('Test case 7: Ngăn chặn gửi nhiều lần (rapid clicks)', async () => {
     let resolve;
     const p = new Promise(res => { resolve = res; });
@@ -102,9 +102,13 @@ describe('Login component unit tests', () => {
     fireEvent.change(screen.getByTestId('username-input'), { target: { value: 'admin' } });
     fireEvent.change(screen.getByTestId('password-input'), { target: { value: '123456' } });
     const btn = screen.getByTestId('login-button');
+
+    // mô phỏng clicks
     fireEvent.click(btn);
     fireEvent.click(btn);
     fireEvent.click(btn);
+
+    // Chỉ 1 cuộc gọi
     expect(authService.loginUser).toHaveBeenCalledTimes(1);
 
     resolve({ success: true, message: 'ok', token: 'tkn' });
@@ -113,15 +117,21 @@ describe('Login component unit tests', () => {
     });
   });
 
+
   // Test case 8: Submit bằng phím Enter
+  // Gửi yêu cầu trên biểu mẫu để đảm bảo trình xử lý onSubmit chạy
   test('Test case 8: Submit bằng phím Enter', async () => {
     authService.loginUser.mockResolvedValue({ success: true, message: 'ok', token: 'enter-tkn' });
     render(<MemoryRouter><Login /></MemoryRouter>);
     const username = screen.getByTestId('username-input');
     const password = screen.getByTestId('password-input');
+
     fireEvent.change(username, { target: { value: 'admin' } });
     fireEvent.change(password, { target: { value: '123456' } });
-    fireEvent.keyDown(password, { key: 'Enter', code: 'Enter', charCode: 13 });
+
+    const form = screen.getByTestId('login-button').closest('form');
+    fireEvent.submit(form);
+
     await waitFor(() => {
       expect(authService.loginUser).toHaveBeenCalledWith('admin', '123456');
       expect(localStorage.getItem('token')).toBe('enter-tkn');
